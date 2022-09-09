@@ -18,13 +18,6 @@ with open(file_path + '/fmm_dic.pkl', "wb") as f:
                               "chose_pos":["",""]},
                 "hair color":{"phrases":[],
                               "chose_pos":["",""]}}
-
-    features = {"clothing":"{name} were {JJ} {NN}",
-                "age":"{name} is {CD} yeas old",
-                "height":"{name} is {CD}",
-                "gender":"{name} is {}",
-                "skin color":"{name} has {}",
-                "hair color":"{name} has {}"}
     pickle.dump(features, f)
 
 

@@ -8,6 +8,7 @@ from happymimi_msgs.srv import StrTrg
 from happymimi_voice_msgs.srv import SpeechToText
 import nltk
 import re
+import pickle
 
 file_path = os.path.expanduser("~/catkin_ws/src/")
 path = os.path.expanduser('~/catkin_ws/src/happymimi_voice/config')
@@ -23,19 +24,40 @@ class FmmStruction:
         stt_pub = rospy.ServiceProxy('/stt_server', SpeechToText)
         tts_pub = rospy.ServiceProxy('/tts_srvserver', StrTrg)
         rospy.loginfo("server is ready")
-        self.server=rospy.Service('/fmm_character',srv,self.main)
+#        self.server=rospy.Service('/fmm_character',srv,self.main)
         self.quetion_dic = {"clothing":"",
                             "age":"How old are you",
                             "height":"how tall are you",
                             "gender":"Cloud you tell me your gender",
                             "skin color":"what is your skin color",
                             "hair color":"what is your heir color"}
+        feature_dic = {"clothing":{"phrases":[],
+                                   "chose_pos":["NN","JJ"]},
+                    "age":{"phrases":[],
+                           "chose_pos":["CD"]},
+                    "height":{"phrases":[],
+                              "chose_pos":["CD"]},
+                    "gender":{"phrases":[],
+                              "chose_pos":[""]},
+                    "skin color":{"phrases":[],
+                                  "chose_pos":["",""]},
+                    "hair color":{"phrases":[],
+                                  "chose_pos":["",""]}}
 
-    def main(_dammy):
+        person_dic = {"clothing":"{name} wears a {JJ} {NN}",
+                   "age":"{name} is {CD} yeas old",
+                   "height":"{name} is {CD}",
+                   "gender":"{name} is {}",
+                   "skin color":"{name} has {}",
+                   "hair color":"{name} has {}"}
+
+
+    def getName():
         yn = "no"
         while yn != "yes":
             tts_pub("what is your name")
-            ans =  stt_pub(short_str = True, context_phrases=["",],boost_value=20.0).result_str
+            name_sen =  stt_pub(short_str = True,
+                    context_phrases=["",],boost_value=20.0).result_str
             morph = nltk.word_tokenize(ans)
             pos1 = nltk.pos_tag(morph)
             entities = nltk.chunk.ne_chunk(pos1)
@@ -56,9 +78,10 @@ class FmmStruction:
                         else:
                             tts_pub("one more time please")
                             continue
+        return person_name
 
 
-    def get_feature():
+    def getFeature():
         with open(file_path + "/sp_fmm/config/fmm_character.pkl", "r") as f:
             features = pickle.load(f)
             if features != []:
@@ -66,8 +89,6 @@ class FmmStruction:
                 question = quetion_dic.get(feature)
                     if question:
                         tts_pub(question)
-
-
 '''
                         if feature == "clothing":
 
@@ -81,16 +102,23 @@ class FmmStruction:
 
                         elif feature == "heir color":
 '''
-                        with open(file_path + "sp_fmm/config/fmm_dic.pkl") as f:
-                            features = pickle.load(f)
-                            cp = features[feature].get("phrases")
-                            ans = stt_pub(context_phrases = cp,boost_value = 20.0).result_str
-                            pos2 = pos_tag.tag(ans.split())
-                            for i in range(len(pos2)):
-                                if 
+                        cp = features[feature].get("phrases")
+                        ans = stt_pub(context_phrases = cp,boost_value = 20.0).result_str
+                        pos2 = pos_tag.tag(ans.split())
+                        for i in range(len(pos2)):
+                            for chose_pos in features[feature].get("chose_pos"):
+                                if pos2[i][0] == chose_pos:
+
+
+
+
 
                     else:
                         return False
+
+    def makeSentence():
+        
+
 
 
 
@@ -98,6 +126,6 @@ class FmmStruction:
 
 if __name__ == '__main__':
     rospy.init_node('fmm_character')
-    FmmStruction()
+    FmmStruction
     rospy.spin()
 
