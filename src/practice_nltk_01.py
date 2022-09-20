@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-a
+
 import os
 import rospy
 import random
@@ -15,6 +15,7 @@ file_path = os.path.expanduser("~/catkin_ws/src/")
 path = os.path.expanduser('~/catkin_ws/src/happymimi_voice/config')
 pos_tag = StanfordPOSTagger(model_filename = path + "/dataset/stanford-postagger/models/english-bidirectional-distsim.tagger",
                         path_to_jar = path + "/dataset/stanford-postagger/stanford-postagger.jar")
+'''
 
 class FmmStruction:
     def __init__(self):
@@ -94,9 +95,9 @@ class FmmStruction:
                 feature = features[0]
                 question = quetion_dic.get(feature)
                 if question:
-                    self.tts_pub(question)
+                    tts_pub(question)
                     cp = features[feature].get("phrases")
-                    ans = self.stt_pub(context_phrases = cp,boost_value = 20.0).result_str
+                    ans = stt_pub(context_phrases = cp,boost_value = 20.0).result_str
                     pos2 = pos_tag.tag(ans.split())
                     for i in range(len(pos2)):
                         for chose_pos in features[feature].get("chose_pos"):
@@ -127,4 +128,18 @@ if __name__ == '__main__':
     fmm = FmmStruction()
     fmm.main()
     rospy.spin()
+'''
+sen = " i am twenty years old"
+sen = "my age is twenty"
+sen = "i am twenty"
+pos = pos_tag.tag(sen.split())
+print(pos)
+
+ans = "i am twenty"
+pos2 = pos_tag.tag(ans.split())
+for i in range(len(pos2)):
+    for chose_pos in self.feature_dic[feature].get("chose_pos"):
+        if pos2[i][0] == chose_pos:
+            print(pos2[i][1])
+            ls.append(pos2[i][1])
 

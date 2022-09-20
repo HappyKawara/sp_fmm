@@ -4,8 +4,8 @@
 import os
 import pickle
 
-file_path=os.path.expanduser('~/catkin_ws/src/q1_voice_okr/config')
+file_path=os.path.expanduser('~/catkin_ws/src/sp_fmm/config')
 with open(file_path + '/fmm_feature.pkl', "wb") as f:
-    features = ["clothing","age","height","gender","hair color"]
+    features = ["age","height","gender","hair color"]
     pickle.dump(features, f)
 

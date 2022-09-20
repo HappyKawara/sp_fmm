@@ -1,0 +1,18 @@
+Q:what your name?
+
+A:My name is Jhon.
+
+Q:Are you {name}?
+
+A:yes - no
+
+(Q:one more plese
+ A:My name is {name} )
+
+Q:how old are you
+
+A:i am twenty years old.
+
+
+
+
