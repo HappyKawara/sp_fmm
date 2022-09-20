@@ -1,4 +1,4 @@
-#usr/bin/env python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 import os
@@ -15,7 +15,7 @@ path = os.path.expanduser('~/catkin_ws/src/happymimi_voice/config')
 pos_tag = StanfordPOSTagger(model_filename = path +
                         "/dataset/stanford-postagger/models/english-bidirectional-distsim.tagger",
                         path_to_jar = path + "/dataset/stanford-postagger/stanford-postagger.jar")
-ans = "my name is Arone"
+ans = "MY NAME IS JONE"
 
 morph = nltk.word_tokenize(ans)
 pos = nltk.pos_tag(morph)
