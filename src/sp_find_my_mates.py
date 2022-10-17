@@ -10,6 +10,9 @@ import nltk
 import re
 import pickle
 from nltk.tag.stanford import StanfordPOSTagger
+from happymimi_voice_msgs.srv import StringToString
+from happymimi_voice_msgs.srv import StringToStringResponse
+
 
 file_path = os.path.expanduser("~/catkin_ws/src")
 path = os.path.expanduser('~/catkin_ws/src/happymimi_voice/config')
@@ -55,8 +58,8 @@ class FmmStruction:
         yn = "no"
         while yn != "yes":
             self.tts_pub("what is your name")
-            name_sen =  self.stt_pub(short_str = True,context_phrases=["",],boost_value=20.0).result_str
-            #name_sen = "my name is Jone"
+            #name_sen =  self.stt_pub(short_str = True,context_phrases=["",],boost_value=20.0).result_str
+            name_sen = "my name is Olivia"
             name_ls = name_sen.split()
             for i,name_word in enumerate(name_ls):
                 name_ls[i] = name_word.title()
@@ -66,28 +69,39 @@ class FmmStruction:
             entities = nltk.chunk.ne_chunk(pos1)
             print(entities)
             ls = name_sen.split()
+            person_name = ""
             for i,en in enumerate(entities):
                 if ls[i] != en[0]:
-                    person_name = en[0][0]
-                    print(person_name)
-                    while 1:
-                        self.tts_pub("Are you" + person_name + "?")
-                        yn = self.stt_pub(short_str = True,context_phrases = ["yes","no"],
-                                boost_value=20.0).result_str
-                        #yn = "yes"
-                        if yn == "yes":
-                            break
-                        elif yn == "no":
-                            self.tts_pub("one more time please")
-                            rospy.loginfo("er 2")
-                            break
-                        else:
-                            self.tts_pub("one more time please")
-                            rospy.loginfo("er 3")
-                            continue
-                elif i == len(ls) - 1:
-                    self.tts_pub("one more time please")
-                    rospy.loginfo("er 1")
+                    for e in en:
+                        person_name = person_name + " " + e[0]
+                        print(person_name)
+
+            if person_name:
+                while 1:
+                    self.tts_pub("Are you" + person_name + "?")
+                    print("Are you" + person_name + "?")
+
+                    #yn = self.stt_pub(short_str = True,context_phrases = ["yes","no"],
+                    #        boost_value=20.0).result_str
+                    yn = "yes"
+                    if yn == "yes":
+                        break
+                    elif yn == "no":
+                        self.tts_pub("one more time please")
+                        rospy.loginfo("er 2")
+                        break
+                    else:
+                        self.tts_pub("one more time please")
+                        rospy.loginfo("er 3")
+                        continue
+                ge = rospy.ServiceProxy('/gender_jg',StringToString)
+                x = ge(person_name)
+                self.gender = x.result_data
+
+            else:
+                self.tts_pub("one more time please")
+                rospy.loginfo("er 1")
+
         return person_name
 
 
@@ -105,21 +119,23 @@ class FmmStruction:
                         print(question)
                         cp = self.feature_dic[feature].get("phrases")
                         print(cp)
-                        ans = self.stt_pub(context_phrases = cp,boost_value = 20.0).result_str
-                        #ans = "i am twenty"
+                        #ans = self.stt_pub(context_phrases = cp,boost_value = 20.0).result_str
+                        ans = "I am 20."
+                        print(ans)
                         pos2 = pos_tag.tag(ans.split())
                         for i in range(len(pos2)):
                             for chose_pos in self.feature_dic[feature].get("chose_pos"):
                                 if pos2[i][1] == chose_pos:
                                     print(pos2[i][0])
                                     ls.append(pos2[i][0])
-                        yn = ""
-                        while yn != "no":
-                            self.tts_pub(" ".join(ls[1::]))
-                            yn = self.stt_pub(short_str = True,context_phrases = ["yes","no"]).result_str
-                            #yn = "yes"
-                            if yn == "yes":
-                                if ls != []:
+                        print(ls)
+                        if ls:
+                            yn = ""
+                            while yn != "no":
+                                self.tts_pub(" ".join(ls))
+                                #yn = self.stt_pub(short_str = True,context_phrases = ["yes","no"]).result_str
+                                yn = "yes"
+                                if yn == "yes":
                                     with open(file_path + "/sp_fmm/config/fmm_feature.pkl", "wb") as wf:
                                         features = features[1::]
                                         pickle.dump(features,wf)
@@ -139,6 +155,7 @@ class FmmStruction:
                 for i,fea in enumerate(self.feature_dic[pos_ls[0]]["chose_pos"]):
                     pos_sen = re.sub("{" + fea + "}",pos_ls[i+1],name)
                     ans_dic[pos_ls[0]] = pos_sen
+                ans_dic["gender"] = self.gender
                 with open(file_path + "/sp_fmm/config/ans_dic.pkl","wb") as wf:
                     pickle.dump(ans_dic,wf)
                     print(ans_dic)
