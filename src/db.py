@@ -104,7 +104,7 @@ class FmmStruction:
                         cp = self.feature_dic[feature].get("phrases")
                         print(cp)
                         #ans = stt_pub(context_phrases = cp,boost_value = 20.0).result_str
-                        ans = "i am twenty"
+                        ans = "20."
                         pos2 = pos_tag.tag(ans.split())
                         for i in range(len(pos2)):
                             for chose_pos in self.feature_dic[feature].get("chose_pos"):
